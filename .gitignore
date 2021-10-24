@@ -4,3 +4,5 @@
 04-sql/.venv/
 04-sql/db/
 04-sql/db_metabase-data/
+# Exercicio 05
+05-capturando-dados-api/.venv/
