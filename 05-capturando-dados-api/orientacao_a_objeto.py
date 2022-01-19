@@ -1,3 +1,4 @@
+#%%
 import datetime
 import math
 
@@ -21,3 +22,4 @@ print(andre.nome)
 print(andre.sobrenome)
 print(andre.data_de_nascimento)
 print(andre.idade)
+# %%
