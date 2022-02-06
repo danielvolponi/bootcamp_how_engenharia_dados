@@ -54,7 +54,6 @@ print(curriculo_andre)
 curriculo_andre.adiciona_experiencia("How Education")
 print(curriculo_andre)
 
-## 14:52
 class Vivente:
     def __init__(self, nome: str, data_de_nascimento: datetime.date) -> None:
         self.nome = nome
