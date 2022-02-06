@@ -70,7 +70,7 @@ class PessoaHeranca(Vivente):
     def __str__(self) -> str:
         return f"{self.nome} tem {self.idade} anos."
 
-    def fala(self, frase):
+    def fala(self, frase): 
         return self.emite_ruido(frase)
 
 class Cachorro(Vivente):

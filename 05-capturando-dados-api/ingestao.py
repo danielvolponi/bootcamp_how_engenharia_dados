@@ -1,10 +1,14 @@
+#%%
 from abc import ABC, abstractmethod
-
 import requests
 import logging
 import datetime
+#%%
+# Teste para verificar se a api está funcionando
+print(requests.get("https://www.mercadobitcoin.net/api/BTC/day-summary/2022/2/2").json())
 
-logger = logging.getLogger(__name__)
+#%%
+logger = logging.getLogger(__name__) #__name__ - retorna o nome do script que está sendo executado
 logging.basicConfig(level=logging.INFO)
 
 class MercadoBitcoinApi(ABC):
@@ -59,8 +63,10 @@ class DataWriter:
     def __init__(self, filename: str) -> None:
         pass
 
-# print(DaySummaryApi(coin="BTC").get_data(date=datetime.date(2021,11, 5)))
+print(DaySummaryApi(coin="BTC").get_data(date=datetime.date(2021,11, 5)))
 # TradesApi(coin="BTC").get_data()
 # TradesApi(coin="BTC").get_data(date_from=datetime.datetime(2021, 11, 2))
 # TradesApi(coin="BTC").get_data(date_from=datetime.datetime(2021, 11, 2), date_to=datetime.datetime(2021, 11, 3))
 
+
+# %%
