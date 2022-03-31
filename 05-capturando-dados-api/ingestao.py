@@ -3,9 +3,12 @@ from abc import ABC, abstractmethod
 import requests
 import logging
 import datetime
+import json
+from typing import List
+import os
 #%%
 # Teste para verificar se a api está funcionando
-print(requests.get("https://www.mercadobitcoin.net/api/BTC/day-summary/2022/2/2").json())
+# print(requests.get("https://www.mercadobitcoin.net/api/BTC/day-summary/2022/2/2").json())
 
 #%%
 logger = logging.getLogger(__name__) #__name__ - retorna o nome do script que está sendo executado
@@ -58,15 +61,69 @@ class TradesApi(MercadoBitcoinApi):
 
         return endpoint
 
+class DataTypeNotSuppoetedForIngestionException(Exception):
+    def __init__(self, data):
+        self.data = data
+        self.message = f"Data Type {type(data)} is not supported for ingestion"
+        super().__init__(self.message)
 
-class DataWriter:
-    def __init__(self, filename: str) -> None:
+
+class DataWriter():
+    def __init__(self, coin: str, api: str) -> None:
+        self.coin = coin
+        self.api = api
+        self.filename = f"{self.api}/{self.coin}/{datetime.datetime.now()}.json"
+    
+    def _write_row(self, row: str) -> None:
+        os.makedirs(os.path.dirname(self.filename), exist_ok = True)
+        # insere os dados no modo append
+        with open(self.filename, "a") as f:
+            f.write(row)
+    
+    def write(self, data: [List, dict]):
+        # isinstance verifica a classe do tipo data
+        if isinstance(data, dict):
+            self._write_row(json.dumps(data) + "\n")
+        elif isinstance(data, List):
+            for element in data:
+                self.write(element)
+        else:
+            raise DataTypeNotSuppoetedForIngestionException(data)
+
+class DataIngestor(ABC):
+    def __init__(self, writer: DataWriter, coins: List[str], default_start_date: datetime.date) -> None:
+        self.coins = coins
+        self.default_start_date = default_start_date
+        self.writer = writer
+    
+    @abstractmethod
+    def ingest(self) -> None:
         pass
 
-print(DaySummaryApi(coin="BTC").get_data(date=datetime.date(2021,11, 5)))
+class DaysummaryIngestor(DataIngestor):
+       
+    def ingest(self) -> None:
+        date = self.default_start_date
+        if date < datetime.date.today():
+            for coin in self.coins:
+                api = DaySummaryApi(coin=coin)
+                data = api.get_data(date=date)
+                self.writer(coin=coin, api=api.type).write(data)
+                # Atualizar a data
+                
+# print(DaySummaryApi(coin="BTC").get_data(date=datetime.date(2021,11, 5)))
 # TradesApi(coin="BTC").get_data()
 # TradesApi(coin="BTC").get_data(date_from=datetime.datetime(2021, 11, 2))
-# TradesApi(coin="BTC").get_data(date_from=datetime.datetime(2021, 11, 2), date_to=datetime.datetime(2021, 11, 3))
+# print(TradesApi(coin="BTC").get_data(date_from=datetime.datetime(2021, 11, 2), date_to=datetime.datetime(2021, 11, 3)))
+# Testando o Writer
+# data = DaySummaryApi("BTC").get_data(date=datetime.date(2022, 3, 29))
+# writer = DataWriter('day-summary.json')
+# writer.write(data)
 
-
+# data = TradesApi("BTC").get_data()
+# writer = DataWriter('trades.json')
+# writer.write(data)
 # %%
+
+ingestor = DaysummaryIngestor(writer = DataWriter, coins = ["BTC", "ETH", "LTC"], default_start_date=datetime.date(2021, 6, 1))
+ingestor.ingest()
