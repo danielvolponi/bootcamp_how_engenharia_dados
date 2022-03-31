@@ -6,6 +6,10 @@ import datetime
 import json
 from typing import List
 import os
+from schedule import repeat, every, run_pending
+import time
+from backoff import on_exception , expo
+import ratelimit
 #%%
 # Teste para verificar se a api está funcionando
 # print(requests.get("https://www.mercadobitcoin.net/api/BTC/day-summary/2022/2/2").json())
@@ -26,6 +30,9 @@ class MercadoBitcoinApi(ABC):
         pass
 
     # Metodo para buscar os dados de fato
+    @on_exception(expo, ratelimit.exception.RateLimitException, max_tries=10)
+    @ratelimit.limits(calls=29, period=30)
+    @on_exception(expo, requests.exceptions.HTTPError, max_tries=10)
     def get_data(self, **kwargs) -> dict:
         endpoint = self._get_endpoint(**kwargs)
         logger.info(f"Getting data from endpoint: {endpoint}")
@@ -95,6 +102,32 @@ class DataIngestor(ABC):
         self.coins = coins
         self.default_start_date = default_start_date
         self.writer = writer
+        self._checkpoint = self._load_checkpoint()
+    
+    @property
+    def _checkpoint_filename(self) -> str:
+        return f"{self.__class__.__name__}.checkpoint"
+        
+    def _write_checkpoint(self):
+        with open(self._checkpoint_filename, "w") as f:
+            f.write(f"{self._checkpoint}")
+    
+    def _load_checkpoint(self) -> datetime.date:
+        try:
+            with open(self._checkpoint_filename, "r") as f:
+                return datetime.datetime.strptime(f.read(), "%Y-%m-%d").date()
+        except FileNotFoundError:
+            return None
+            
+    def _get_checkpoint(self):
+        if not self._checkpoint:
+            return self.default_start_date
+        else:
+            return self._checkpoint
+        
+    def _update_checkpoint(self, value):
+        self._checkpoint = value
+        self._write_checkpoint()
     
     @abstractmethod
     def ingest(self) -> None:
@@ -103,13 +136,13 @@ class DataIngestor(ABC):
 class DaysummaryIngestor(DataIngestor):
        
     def ingest(self) -> None:
-        date = self.default_start_date
+        date = self._get_checkpoint()
         if date < datetime.date.today():
             for coin in self.coins:
                 api = DaySummaryApi(coin=coin)
                 data = api.get_data(date=date)
                 self.writer(coin=coin, api=api.type).write(data)
-                # Atualizar a data
+            self._update_checkpoint(date + datetime.timedelta(days=1))
                 
 # print(DaySummaryApi(coin="BTC").get_data(date=datetime.date(2021,11, 5)))
 # TradesApi(coin="BTC").get_data()
@@ -125,5 +158,13 @@ class DaysummaryIngestor(DataIngestor):
 # writer.write(data)
 # %%
 
-ingestor = DaysummaryIngestor(writer = DataWriter, coins = ["BTC", "ETH", "LTC"], default_start_date=datetime.date(2021, 6, 1))
+ingestor = DaysummaryIngestor(writer = DataWriter, coins = ["BTC", "ETH", "LTC"], default_start_date=datetime.date(2021, 6, 2))
 ingestor.ingest()
+
+@repeat(every(1).seconds)
+def job():
+    ingestor.ingest()
+
+while True:
+    run_pending()
+    time.sleep(0.5)
