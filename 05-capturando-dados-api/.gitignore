@@ -1,1 +1,3 @@
 day-summary/
+*.checkpoint
+__pycache__/
