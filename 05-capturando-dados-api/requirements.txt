@@ -17,6 +17,7 @@ defusedxml==0.7.1
 entrypoints==0.3
 executing==0.8.2
 idna==3.3
+iniconfig==1.1.1
 ipykernel==6.7.0
 ipython==8.0.1
 ipython-genutils==0.2.0
@@ -42,14 +43,17 @@ pathspec==0.9.0
 pexpect==4.8.0
 pickleshare==0.7.5
 platformdirs==2.4.1
+pluggy==1.0.0
 prometheus-client==0.13.1
 prompt-toolkit==3.0.24
 ptyprocess==0.7.0
 pure-eval==0.2.1
+py==1.11.0
 pycparser==2.21
 Pygments==2.11.2
 pyparsing==3.0.7
 pyrsistent==0.18.1
+pytest==7.1.2
 python-dateutil==2.8.2
 pyzmq==22.3.0
 ratelimit==2.2.1
@@ -64,7 +68,7 @@ testpath==0.6.0
 tomli==1.2.3
 tornado==6.1
 traitlets==5.1.1
-typing-extensions==4.0.1
+typing_extensions==4.0.1
 urllib3==1.26.7
 wcwidth==0.2.5
 webencodings==0.5.1
