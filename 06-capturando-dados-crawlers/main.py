@@ -27,7 +27,7 @@ if cep:
     elem_cep.clear()
     elem_cep.send_keys(cep)
     elem_cmb.click()
-    driver.find_element(by = By.XPATH, value='//*[@id="formulario"]/div[2]/div/div[2]/select/option[6]').click()
+    # driver.find_element(by = By.XPATH, value='//*[@id="formulario"]/div[2]/div/div[2]/select/option[6]').click()
 
     # %%
     driver.find_element(by = By.ID, value = 'btn_pesquisar').click()

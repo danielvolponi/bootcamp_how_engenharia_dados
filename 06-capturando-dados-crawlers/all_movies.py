@@ -1,4 +1,5 @@
 #%%
+from opcode import opname
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -18,6 +19,12 @@ tabela = driver.find_element(
 ).get_attribute('innerHTML')
 # driver.close()
 # print(tabela)
+#%%
+with open('print.png', 'wb') as f:
+    f.write(driver.find_element(by = By.XPATH, value = '/html/body/div').screenshot_as_png)
+
+#%%
+
 
 test_path = '//*[@id="mw-content-text"]/div[1]/table[2]'
 #%%
