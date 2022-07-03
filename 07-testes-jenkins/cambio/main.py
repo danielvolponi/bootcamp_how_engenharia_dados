@@ -5,7 +5,6 @@ from datetime import date, datetime
 def cotacao(valor):
     url = "http://economia.awesomeapi.com.br/json/last/USD-BRL"
     ret = requests.get(url)
-    print(json.loads(ret.text))
     dolar = json.loads(ret.text)["USDBRL"]
     return (float(dolar['bid']) * valor)
 
