@@ -1,0 +1,15 @@
+version: "3"
+services:
+    jenkins:
+        # Criando a imagem pyjenkins que vai criar um container com o nome jenkins_daniel
+        image: pyjenkins
+        container_name: "jenkins_daniel"
+        # usando a porta 8000 refletido para a 8080 no container e a porta 50.000
+        ports: 
+            - "8000:8080"
+            - "50000:50000"
+        # Vai mapear dentro do container
+        volumes:
+            - "./jenkins_home:/var/jenkins_home"
+            - "./cambio:/cambio"
+
