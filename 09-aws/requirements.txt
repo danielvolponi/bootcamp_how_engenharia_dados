@@ -1,0 +1,4 @@
+pandas
+ipython
+boto3 
+python-dotenv
