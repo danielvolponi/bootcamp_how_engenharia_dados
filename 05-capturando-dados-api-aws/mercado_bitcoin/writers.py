@@ -5,7 +5,6 @@ import os
 from tempfile import NamedTemporaryFile
 from typing import List
 
-boto3.setup_default_session(profile_name='daniel-estudo')
 
 class DataTypeNotSuppoetedForIngestionException(Exception):
     def __init__(self, data):
