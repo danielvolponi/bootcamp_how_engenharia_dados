@@ -17,7 +17,7 @@ class CheckpointModel(Model):
 
         
 class DynamoCheckpoints:
-    def __init__(self, model: Model, report_id: str, default_start_date: datetime.date):
+    def __init__(self, model: CheckpointModel, report_id: str, default_start_date: datetime.date):
          self.default_start_date = default_start_date
          self.model = model
          self.report_id = report_id
@@ -33,7 +33,7 @@ class DynamoCheckpoints:
         checkpoint.save()
         
     def create_or_update_checkpoint(self, checkpoint_date):
-        logger.info(f"Saving checkpoint foir {self.report_id}: {checkpoint_date}")
+        logger.info(f"Saving checkpoint for {self.report_id}: {checkpoint_date}")
         if not self.checkpoint_exist:
             self.create_checkpoint(checkpoint_date)
         else:
@@ -53,4 +53,11 @@ class DynamoCheckpoints:
             self.model.create_table(billing_mode="PAY_PER_REQUEST", wait=True)
         
         
-DynamoCheckpoints(model=CheckpointModel, report_id="abc", default_start_date=datetime.date(2021, 6, 1))
+    def get_checkpoint(self):
+        if self.checkpoint_exist:
+            checkpoint = list(self.model.query(self.report_id))[0].checkpoint_date
+            logger.info(f"Checkpoint found for {self.report_id}: {checkpoint}")
+            return datetime.datetime.strptime(checkpoint, "%Y-%m-%d").date()
+        else:
+            logger.info(f"Checkpoint not found for {self.report_id} using default_start_date")
+            return self.default_start_date
