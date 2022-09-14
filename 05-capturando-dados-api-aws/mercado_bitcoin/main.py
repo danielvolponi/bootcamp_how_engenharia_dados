@@ -3,8 +3,8 @@ import datetime
 from schedule import repeat, every, run_pending
 import time
 
-from ingestors import AwsDaysummaryIngestor, DaysummaryIngestor
-from writers import DataWriter, S3Writer
+from ingestors import AwsDaysummaryIngestor
+from writers import S3Writer
 
 if __name__ == '__main__':
     day_summary_ingestor = AwsDaysummaryIngestor(

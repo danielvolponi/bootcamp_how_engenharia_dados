@@ -1,9 +1,11 @@
 import datetime
 from abc import ABC, abstractmethod
 from typing import List
-from apis import DaySummaryApi
-from checkpoints import CheckpointModel, DynamoCheckpoints
-from writers import DataWriter
+
+from mercado_bitcoin.checkpoints import CheckpointModel, DynamoCheckpoints
+from mercado_bitcoin.apis import DaySummaryApi
+from mercado_bitcoin.writers import DataWriter
+
 
 class DataIngestor(ABC):
     def __init__(self, writer: DataWriter, coins: List[str], default_start_date: datetime.date) -> None:

@@ -1,4 +1,3 @@
-import boto3
 import datetime
 import logging
 from pynamodb.models import Model
